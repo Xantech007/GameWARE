@@ -94,7 +94,7 @@
 <!-- HERO -->
 <div class="hero">
     <div class="hero-text">
-        <h1><i class="fa-solid fa-gamepad"></i> Play Games & Earn <?php echo $currency; ?></h1>
+        <h1><i class="fa-solid fa-gamepad"></i> Play Games & Earn Real Cash</h1>
         <p>
             Enjoy fun, skill-based games while earning real rewards. 
             The more you play, the more you earn. Simple, fast, and secure payouts.
