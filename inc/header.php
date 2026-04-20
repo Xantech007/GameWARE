@@ -7,16 +7,16 @@ $conn = $db->connect();
 
 $settings = $conn->query("SELECT * FROM settings WHERE id=1")->fetch(PDO::FETCH_ASSOC);
 
-$currency = $settings['currency'];
 $site_name = $settings['site_name'];
+$currency = $settings['currency'];
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title><?php echo $site_name; ?></title>
-<style>
-body{margin:0;background:#111;color:#fff;font-family:Arial;}
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><?php echo htmlspecialchars($site_name); ?></title>
+
+<link rel="stylesheet" href="/assets/css/theme.css">
 </head>
 <body>
