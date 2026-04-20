@@ -1,40 +1,33 @@
-<?php
-session_start();
-?>
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mini Race Car</title>
+<title>Mini Race Car Pro</title>
 
 <style>
 body{
     margin:0;
-    background:#111;
+    background:#000;
     font-family:Arial;
     text-align:center;
     color:#fff;
 }
-
-h2{margin:10px;}
-
 canvas{
-    background:#222;
-    border:3px solid #444;
+    background:#111;
+    border:3px solid #333;
     border-radius:10px;
     width:100%;
     max-width:400px;
     touch-action:none;
 }
-
 button{
-    padding:10px 15px;
+    padding:10px;
     margin:10px;
     border:none;
     border-radius:5px;
     background:#00c3ff;
-    color:#000;
     font-weight:bold;
 }
 </style>
@@ -42,7 +35,7 @@ button{
 
 <body>
 
-<h2>🏎️ Mini Race Car</h2>
+<h2>🏎️ Mini Race Car Pro</h2>
 Score: <span id="score">0</span>
 
 <br>
@@ -57,36 +50,40 @@ const ctx = canvas.getContext("2d");
 let score = 0;
 let speed = 4;
 let gameOver = false;
+let shake = 0;
+let nitro = false;
 
-let car = {
-    x:180,
-    y:500,
-    w:40,
-    h:70
-};
-
+let car = { x:180, y:500, w:40, h:70 };
 let keys = {};
 let obstacles = [];
 
-// ===== DRAW CAR =====
-function drawCar(x,y,color){
-    ctx.fillStyle=color;
-    ctx.fillRect(x,y,40,70);
+let roadY = 0;
+let bgY = 0;
 
-    // windows
-    ctx.fillStyle="#000";
-    ctx.fillRect(x+5,y+10,30,20);
+// ===== BACKGROUND =====
+function drawBackground(){
+    bgY += speed * 0.3;
+    if(bgY > 600) bgY = 0;
+
+    ctx.fillStyle = "#050505";
+    ctx.fillRect(0,0,400,600);
+
+    // fake buildings
+    ctx.fillStyle = "#222";
+    for(let i=0;i<10;i++){
+        let x = i*40;
+        let h = Math.sin(i+bgY*0.01)*50 + 100;
+        ctx.fillRect(x,600-h,30,h);
+    }
 }
 
-// ===== DRAW ROAD =====
-let roadY = 0;
-
+// ===== ROAD =====
 function drawRoad(){
     ctx.fillStyle="#333";
     ctx.fillRect(100,0,200,600);
 
     ctx.strokeStyle="#fff";
-    ctx.lineWidth=5;
+    ctx.lineWidth=4;
 
     for(let i=0;i<600;i+=40){
         ctx.beginPath();
@@ -99,20 +96,34 @@ function drawRoad(){
     if(roadY > 40) roadY = 0;
 }
 
-// ===== SPAWN OBSTACLES =====
+// ===== CAR (UPGRADED LOOK) =====
+function drawCar(x,y){
+    // body
+    let g = ctx.createLinearGradient(x,y,x,y+70);
+    g.addColorStop(0,"#00f");
+    g.addColorStop(1,"#00ffcc");
+
+    ctx.fillStyle = g;
+    ctx.fillRect(x,y,40,70);
+
+    // windows
+    ctx.fillStyle="#111";
+    ctx.fillRect(x+5,y+10,30,20);
+
+    // headlights
+    ctx.fillStyle="yellow";
+    ctx.fillRect(x+5,y,5,5);
+    ctx.fillRect(x+30,y,5,5);
+}
+
+// ===== OBSTACLES =====
 function spawnObstacle(){
     let lane = Math.floor(Math.random()*3);
     let x = 120 + lane*60;
 
-    obstacles.push({
-        x:x,
-        y:-80,
-        w:40,
-        h:70
-    });
+    obstacles.push({ x:x, y:-80, w:40, h:70 });
 }
 
-// ===== DRAW OBSTACLES =====
 function drawObstacles(){
     ctx.fillStyle="#ff4444";
 
@@ -130,10 +141,10 @@ function drawObstacles(){
             car.y + car.h > o.y
         ){
             gameOver = true;
+            shake = 20;
         }
     }
 
-    // remove off screen
     obstacles = obstacles.filter(o => o.y < 700);
 }
 
@@ -144,26 +155,43 @@ function update(){
     if(keys["ArrowLeft"]) car.x -= 6;
     if(keys["ArrowRight"]) car.x += 6;
 
-    // boundaries
+    if(nitro){
+        speed = 8;
+    } else {
+        speed += 0.002;
+    }
+
     car.x = Math.max(110, Math.min(250, car.x));
 
-    if(Math.random() < 0.02){
+    if(Math.random() < 0.025){
         spawnObstacle();
     }
 
     score++;
-    speed += 0.0005;
-
     document.getElementById("score").innerText = score;
 }
 
 // ===== DRAW =====
 function draw(){
+    ctx.save();
+
+    if(shake > 0){
+        ctx.translate(Math.random()*shake-shake/2, Math.random()*shake-shake/2);
+        shake--;
+    }
+
     ctx.clearRect(0,0,400,600);
 
+    drawBackground();
     drawRoad();
-    drawCar(car.x,car.y,"#00ffcc");
+    drawCar(car.x,car.y);
     drawObstacles();
+
+    // nitro overlay
+    if(nitro){
+        ctx.fillStyle="rgba(0,255,255,0.2)";
+        ctx.fillRect(0,0,400,600);
+    }
 
     if(gameOver){
         ctx.fillStyle="rgba(0,0,0,0.7)";
@@ -171,8 +199,10 @@ function draw(){
 
         ctx.fillStyle="#fff";
         ctx.font="28px Arial";
-        ctx.fillText("GAME OVER",110,300);
+        ctx.fillText("CRASH!",130,280);
     }
+
+    ctx.restore();
 }
 
 // ===== LOOP =====
@@ -185,20 +215,24 @@ function loop(){
 // ===== CONTROLS =====
 document.addEventListener("keydown",e=>{
     keys[e.key] = true;
-});
-document.addEventListener("keyup",e=>{
-    keys[e.key] = false;
+    if(e.key === " ") nitro = true;
 });
 
-// MOBILE TOUCH
+document.addEventListener("keyup",e=>{
+    keys[e.key] = false;
+    if(e.key === " ") nitro = false;
+});
+
+// MOBILE
 canvas.addEventListener("touchmove",e=>{
     e.preventDefault();
     let rect = canvas.getBoundingClientRect();
-    let touch = e.touches[0];
-    let x = touch.clientX - rect.left;
-
+    let x = e.touches[0].clientX - rect.left;
     car.x = x - 20;
 },{passive:false});
+
+canvas.addEventListener("touchstart",()=>nitro=true);
+canvas.addEventListener("touchend",()=>nitro=false);
 
 // ===== RESTART =====
 function restartGame(){
