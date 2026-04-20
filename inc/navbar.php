@@ -131,7 +131,21 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <!-- WALLET (always before logout) -->
             <span class="balance">
                 <i class="fa-solid fa-wallet"></i>
-                <?php echo $currency . " " . number_format($_SESSION['balance'],2); ?>
+                <?php
+                $user_balance = 0.00;
+                
+                if(isset($_SESSION['user_id'])){
+                    $stmt = $conn->prepare("SELECT balance FROM users WHERE id = ?");
+                    $stmt->execute([$_SESSION['user_id']]);
+                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                    if($row){
+                        $user_balance = $row['balance'];
+                    }
+                }
+                ?>
+                
+                <?php echo $currency . " " . number_format($user_balance, 2); ?>
             </span>
 
             <!-- LOGOUT -->
