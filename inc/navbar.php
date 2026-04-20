@@ -11,7 +11,7 @@
             <span style="margin-left:15px;">
                 💰 <?php echo $currency . " " . number_format($_SESSION['balance'],2); ?>
             </span>
-            <a href="/dashboard.php">Dashboad</a>
+            <a href="/dashboard.php">Dashboard</a>
             <a href="/logout.php">Logout</a>
         <?php else: ?>
             <a href="/login.php">Login</a>
