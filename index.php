@@ -1,9 +1,12 @@
 <?php include "inc/header.php"; ?>
 <?php include "inc/navbar.php"; ?>
 
+<!-- FONT AWESOME -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
 .container{
-    max-width:1100px;
+    max-width:1150px;
     margin:auto;
     padding:20px;
 }
@@ -14,42 +17,22 @@
     flex-wrap:wrap;
     align-items:center;
     justify-content:space-between;
-    gap:20px;
-    margin-top:30px;
+    gap:30px;
+    margin-top:40px;
 }
 
-.hero-text{
-    flex:1;
-}
-
-.hero h1{
-    font-size:36px;
-    margin-bottom:10px;
-}
-
-.hero p{
-    color:#555;
-    font-size:16px;
-}
-
-.hero-img{
-    flex:1;
-    text-align:center;
-}
+.hero-text{flex:1;}
+.hero h1{font-size:38px;margin-bottom:15px;}
+.hero p{color:#555;font-size:17px;line-height:1.6;}
 
 .hero-img img{
     width:100%;
-    max-width:400px;
+    max-width:420px;
 }
 
-/* SECTIONS */
-.section{
-    margin-top:60px;
-}
-
-.section h2{
-    margin-bottom:20px;
-}
+/* SECTION */
+.section{margin-top:70px;}
+.section h2{margin-bottom:25px;}
 
 /* CARDS */
 .cards{
@@ -59,27 +42,50 @@
 }
 
 .card{
+    padding:25px;
+    text-align:left;
+}
+
+.card i{
+    font-size:28px;
+    color:#00aaff;
+    margin-bottom:10px;
+}
+
+/* STEPS */
+.steps{
+    display:flex;
+    flex-wrap:wrap;
+    gap:20px;
+}
+
+.step{
+    flex:1;
+    min-width:220px;
+    background:#fff;
     padding:20px;
+    border-radius:10px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.05);
 }
 
 /* REVIEWS */
 .review{
     background:#fff;
-    padding:15px;
+    padding:20px;
     border-radius:10px;
     box-shadow:0 5px 15px rgba(0,0,0,0.05);
 }
 
-.review small{
-    color:#777;
+.review i{
+    color:#ffc107;
 }
 
 /* CTA */
 .cta{
     text-align:center;
-    padding:40px;
+    padding:50px;
     background:#eaf6ff;
-    border-radius:10px;
+    border-radius:12px;
 }
 </style>
 
@@ -88,74 +94,99 @@
 <!-- HERO -->
 <div class="hero">
     <div class="hero-text">
-        <h1>🎮 Play Games. Earn Real <?php echo $currency; ?>.</h1>
+        <h1><i class="fa-solid fa-gamepad"></i> Play Games & Earn <?php echo $currency; ?></h1>
         <p>
-            Turn your time into rewards. Play exciting games, earn money, 
-            and withdraw anytime. Simple, fun, and rewarding.
+            Enjoy fun, skill-based games while earning real rewards. 
+            The more you play, the more you earn. Simple, fast, and secure payouts.
         </p>
 
         <br>
 
-        <a href="games.php" class="btn">🎮 Start Playing</a>
+        <a href="games.php" class="btn">
+            <i class="fa-solid fa-play"></i> Start Playing
+        </a>
 
         <?php if(!isset($_SESSION['user_id'])): ?>
             <a href="register.php" class="btn" style="margin-left:10px;background:#222;">
-                Create Account
+                <i class="fa-solid fa-user-plus"></i> Create Account
             </a>
         <?php endif; ?>
     </div>
 
     <div class="hero-img">
-        <img src="assets/images/hero.png" alt="Game">
+        <img src="assets/images/hero.png">
     </div>
 </div>
 
 <!-- HOW IT WORKS -->
 <div class="section">
-    <h2>⚙️ How It Works</h2>
+    <h2><i class="fa-solid fa-gears"></i> How It Works</h2>
+
+    <div class="steps">
+        <div class="step">
+            <h3><i class="fa-solid fa-gamepad"></i> Play</h3>
+            <p>Choose any game and start playing instantly. No downloads needed.</p>
+        </div>
+
+        <div class="step">
+            <h3><i class="fa-solid fa-coins"></i> Earn</h3>
+            <p>Earn <?php echo $currency; ?> based on your gameplay time and performance.</p>
+        </div>
+
+        <div class="step">
+            <h3><i class="fa-solid fa-wallet"></i> Withdraw</h3>
+            <p>Withdraw your earnings securely through supported payment methods.</p>
+        </div>
+    </div>
+</div>
+
+<!-- WHY CHOOSE US -->
+<div class="section">
+    <h2><i class="fa-solid fa-star"></i> Why Choose Us</h2>
 
     <div class="cards">
         <div class="card">
-            <h3>🎮 Play Games</h3>
-            <p>Choose from multiple fun games and start playing instantly.</p>
+            <i class="fa-solid fa-bolt"></i>
+            <h3>Instant Play</h3>
+            <p>No downloads. No waiting. Just click and play.</p>
         </div>
 
         <div class="card">
-            <h3>💰 Earn Money</h3>
-            <p>Earn <?php echo $currency; ?> based on your play time and performance.</p>
+            <i class="fa-solid fa-shield-halved"></i>
+            <h3>Secure System</h3>
+            <p>Your earnings and data are protected with secure backend systems.</p>
         </div>
 
         <div class="card">
-            <h3>💸 Withdraw</h3>
-            <p>Request withdrawals anytime directly to your preferred method.</p>
+            <i class="fa-solid fa-money-bill-wave"></i>
+            <h3>Real Earnings</h3>
+            <p>Convert your gameplay into real withdrawable money.</p>
         </div>
     </div>
 </div>
 
 <!-- FEATURED GAMES -->
 <div class="section">
-    <h2>🔥 Featured Games</h2>
+    <h2><i class="fa-solid fa-fire"></i> Featured Games</h2>
 
     <div class="cards">
-
         <div class="card">
-            <h3>🏎️ Race Car</h3>
-            <p>Dodge traffic and survive as long as possible.</p>
+            <h3><i class="fa-solid fa-car"></i> Race Car</h3>
+            <p>Avoid traffic and survive as long as possible.</p>
             <a href="games/race-car.php" class="btn">Play</a>
         </div>
 
         <div class="card">
-            <h3>🎯 Bubble Shooter</h3>
-            <p>Match bubbles and clear the board.</p>
+            <h3><i class="fa-solid fa-bullseye"></i> Bubble Shooter</h3>
+            <p>Match bubbles and clear levels.</p>
             <a href="games/bubble.php" class="btn">Play</a>
         </div>
-
     </div>
 </div>
 
-<!-- TRUST / STATS -->
+<!-- STATS -->
 <div class="section">
-    <h2>📊 Trusted by Players</h2>
+    <h2><i class="fa-solid fa-chart-line"></i> Platform Stats</h2>
 
     <div class="cards">
         <div class="card">
@@ -165,11 +196,11 @@
 
         <div class="card">
             <h3>5,000+</h3>
-            <p>Active Players</p>
+            <p>Active Users</p>
         </div>
 
         <div class="card">
-            <h3>₦1,000,000+</h3>
+            <h3><?php echo $currency; ?> 1,000,000+</h3>
             <p>Total Paid Out</p>
         </div>
     </div>
@@ -177,26 +208,26 @@
 
 <!-- REVIEWS -->
 <div class="section">
-    <h2>💬 What Players Say</h2>
+    <h2><i class="fa-solid fa-comments"></i> Player Reviews</h2>
 
     <div class="cards">
 
         <div class="review">
-            ⭐⭐⭐⭐⭐<br>
-            “This is actually legit. I earned and withdrew without issues.”
-            <br><small>- Daniel</small>
+            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            <p>“This platform is legit. I’ve already withdrawn twice!”</p>
+            <small>- Daniel</small>
         </div>
 
         <div class="review">
-            ⭐⭐⭐⭐⭐<br>
-            “The games are fun and addictive. Love the earning system.”
-            <br><small>- Sarah</small>
+            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            <p>“Fun games and real rewards. Highly recommend.”</p>
+            <small>- Sarah</small>
         </div>
 
         <div class="review">
-            ⭐⭐⭐⭐⭐<br>
-            “Best play-to-earn site I’ve used so far.”
-            <br><small>- Michael</small>
+            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            <p>“Best play-to-earn experience I’ve used.”</p>
+            <small>- Michael</small>
         </div>
 
     </div>
@@ -205,16 +236,18 @@
 <!-- CTA -->
 <div class="section">
     <div class="cta">
-        <h2>🚀 Ready to Start Earning?</h2>
+        <h2><i class="fa-solid fa-rocket"></i> Start Earning Today</h2>
         <p>Join thousands of players already earning <?php echo $currency; ?>.</p>
 
         <br>
 
-        <a href="games.php" class="btn">Start Playing Now</a>
+        <a href="games.php" class="btn">
+            <i class="fa-solid fa-play"></i> Start Playing
+        </a>
 
         <?php if(!isset($_SESSION['user_id'])): ?>
             <a href="register.php" class="btn" style="margin-left:10px;background:#222;">
-                Create Free Account
+                <i class="fa-solid fa-user-plus"></i> Sign Up
             </a>
         <?php endif; ?>
     </div>
