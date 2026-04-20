@@ -5,29 +5,30 @@ $current_page = basename($_SERVER['PHP_SELF']);
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-/* ================= NAVBAR BASE ================= */
 .navbar{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    padding:15px 20px;
-    background:#ffffff;
+    padding:15px 25px;
+    background:#fff;
     border-bottom:1px solid #eaeaea;
     box-shadow:0 2px 10px rgba(0,0,0,0.05);
+    flex-wrap:wrap;
     position:relative;
-    z-index:1000;
 }
 
 .nav-left{
     font-size:18px;
     font-weight:bold;
     color:#00aaff;
-    display:flex;
-    align-items:center;
-    gap:8px;
 }
 
-/* ================= NAV RIGHT ================= */
+.nav-toggle{
+    display:none;
+    font-size:22px;
+    cursor:pointer;
+}
+
 .nav-right{
     display:flex;
     align-items:center;
@@ -40,65 +41,57 @@ $current_page = basename($_SERVER['PHP_SELF']);
     color:#333;
     font-weight:500;
     transition:0.2s;
-    padding:6px 10px;
-    border-radius:6px;
 }
 
 .navbar a:hover{
     color:#00aaff;
-    background:#f5faff;
 }
 
-/* balance */
 .balance{
     background:#eaf6ff;
     padding:6px 12px;
     border-radius:20px;
     font-size:14px;
     color:#0077aa;
-    white-space:nowrap;
 }
 
-/* ================= HAMBURGER ================= */
-.menu-toggle{
-    display:none;
-    font-size:22px;
-    cursor:pointer;
-    color:#333;
-}
+/* MOBILE */
+@media (max-width:768px){
 
-/* ================= MOBILE ================= */
-@media (max-width: 768px){
-
-    .menu-toggle{
+    .nav-toggle{
         display:block;
     }
 
     .nav-right{
-        position:absolute;
-        top:60px;
-        right:0;
-        left:0;
-        background:#fff;
+        display:none;
+        width:100%;
         flex-direction:column;
         align-items:flex-start;
-        padding:15px;
-        gap:10px;
-        display:none;
-        border-bottom:1px solid #eee;
-        box-shadow:0 10px 20px rgba(0,0,0,0.08);
+        gap:12px;
+        margin-top:15px;
+        padding-top:10px;
+        border-top:1px solid #eee;
     }
 
     .nav-right.active{
         display:flex;
     }
 
-    .nav-right a, .balance{
+    .nav-right a,
+    .nav-right span{
+        width:100%;
+        padding:10px 0;
+    }
+
+    /* ensure wallet sits directly above logout */
+    .balance{
+        order:1;
         width:100%;
     }
 
-    .balance{
-        text-align:left;
+    .nav-right a[href*="logout"]{
+        order:2;
+        width:100%;
     }
 }
 </style>
@@ -110,14 +103,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <?php echo htmlspecialchars($site_name); ?>
     </div>
 
-    <!-- HAMBURGER ICON -->
-    <div class="menu-toggle" onclick="toggleMenu()">
+    <div class="nav-toggle" onclick="document.querySelector('.nav-right').classList.toggle('active')">
         <i class="fa-solid fa-bars"></i>
     </div>
 
-    <div class="nav-right" id="navMenu">
+    <div class="nav-right">
 
-        <!-- HOME -->
         <?php if($current_page !== 'index.php'): ?>
             <a href="/index.php">
                 <i class="fa-solid fa-house"></i> Home
@@ -131,7 +122,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <?php echo $currency . " " . number_format($_SESSION['balance'],2); ?>
             </span>
 
-            <!-- DASHBOARD -->
             <?php if($current_page !== 'dashboard.php'): ?>
                 <a href="/dashboard.php">
                     <i class="fa-solid fa-chart-line"></i> Dashboard
@@ -155,10 +145,5 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <?php endif; ?>
 
     </div>
-</div>
 
-<script>
-function toggleMenu(){
-    document.getElementById("navMenu").classList.toggle("active");
-}
-</script>
+</div>
