@@ -1,73 +1,90 @@
-<?php
-session_start();
-if (!isset($_SESSION['highscore'])) $_SESSION['highscore'] = 0;
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bubble Shooter Pro (Earn Enabled)</title>
+<?php include "../inc/header.php"; ?>
+<?php include "../inc/navbar.php"; ?>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-body{
-    margin:0;
-    background: radial-gradient(circle,#050505,#000);
-    font-family:Arial;
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
     text-align:center;
-    color:#fff;
 }
-canvas{
-    border:3px solid #333;
+
+.game-box{
+    background:#fff;
+    padding:20px;
     border-radius:12px;
-    box-shadow:0 0 30px #0ff;
-    touch-action:none;
+    box-shadow:0 8px 25px rgba(0,0,0,0.06);
+}
+
+/* CANVAS stays dark for contrast */
+canvas{
+    border:2px solid #ddd;
+    border-radius:12px;
+    background:#000;
     width:100%;
     max-width:500px;
 }
+
+/* BUTTONS */
 button{
     padding:10px 15px;
     margin:5px;
     border:none;
     border-radius:6px;
-    background:#00c3ff;
-    color:#000;
+    background:#00aaff;
+    color:#fff;
     font-weight:bold;
+    cursor:pointer;
 }
+
+button:hover{
+    background:#008ecc;
+}
+
+/* POPUP */
 .popup{
     position:fixed;
-    top:40%;
+    top:50%;
     left:50%;
     transform:translate(-50%,-50%);
-    background:#111;
-    padding:20px;
-    border:2px solid #00c3ff;
+    background:#fff;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.1);
     display:none;
     z-index:999;
+    text-align:center;
 }
 </style>
-</head>
 
-<body>
+<div class="container">
 
-<h2>🎯 Bubble Shooter Pro</h2>
+<h2><i class="fa-solid fa-bullseye"></i> Bubble Shooter</h2>
+<p style="color:#666;">Match bubbles, score points, and earn rewards</p>
 
-<div>
-Score: <span id="score">0</span> |
-High Score: <span><?php echo $_SESSION['highscore']; ?></span>
+<div class="game-box">
+
+<div style="margin-bottom:10px;">
+    Score: <strong id="score">0</strong>
 </div>
 
 <canvas id="game"></canvas>
 
 <br>
-<button onclick="restartGame()">Restart</button>
-<button onclick="toggleSound()" id="soundBtn">🔊 Sound</button>
+<button onclick="restartGame()"><i class="fa-solid fa-rotate"></i> Restart</button>
+<button onclick="toggleSound()" id="soundBtn"><i class="fa-solid fa-volume-high"></i></button>
+
+</div>
+
+</div>
 
 <div id="popup" class="popup"></div>
 
-<audio id="shootSound" src="sounds/shoot.mp3"></audio>
-<audio id="popSound" src="sounds/pop.mp3"></audio>
-<audio id="bgMusic" src="sounds/bg.mp3" loop></audio>
+<audio id="shootSound" src="../sounds/shoot.mp3"></audio>
+<audio id="popSound" src="../sounds/pop.mp3"></audio>
+<audio id="bgMusic" src="../sounds/bg.mp3" loop></audio>
 
 <script>
 const canvas = document.getElementById("game");
@@ -103,8 +120,8 @@ document.addEventListener("click",()=>{
 
 function toggleSound(){
     sound=!sound;
-    if(sound){ bg.play().catch(()=>{}); soundBtn.innerText="🔊 Sound";}
-    else{ bg.pause(); soundBtn.innerText="🔇 Mute";}
+    if(sound){ bg.play().catch(()=>{}); soundBtn.innerHTML='<i class="fa-solid fa-volume-high"></i>';}
+    else{ bg.pause(); soundBtn.innerHTML='<i class="fa-solid fa-volume-xmark"></i>';}
 }
 
 // ===== GAME =====
@@ -114,17 +131,14 @@ let shooter={x:210,y:480,angle:0};
 let current,next;
 let colors=["#ff4d4d","#4dff4d","#4d4dff","#ffff4d","#ff4dff","#4dffff"];
 
-// ===== EFFECTS =====
-let effects=[];
-let stars=[];
-
+let effects=[],stars=[];
 for(let i=0;i<60;i++){
     stars.push({x:Math.random()*BASE_W,y:Math.random()*BASE_H,s:Math.random()*2});
 }
 
 function rand(){return colors[Math.floor(Math.random()*colors.length)];}
 
-// ===== INIT =====
+// INIT
 function init(){
     grid=[];
     for(let r=0;r<ROWS;r++){
@@ -135,7 +149,7 @@ function init(){
     }
 }
 
-// ===== BACKGROUND =====
+// DRAW BG
 function drawBG(){
     ctx.fillStyle="#000";
     ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -152,34 +166,15 @@ function drawBG(){
     ctx.globalAlpha=1;
 }
 
-// ===== BUBBLE =====
-function drawBubble(x,y,color,scale=1,alpha=1){
-    ctx.save();
-    ctx.globalAlpha=alpha;
-    ctx.shadowColor=color;
-    ctx.shadowBlur=15;
-
-    let r=SIZE*scale;
-
-    let g=ctx.createRadialGradient(x-r*0.4,y-r*0.4,r*0.2,x,y,r);
-    g.addColorStop(0,"#fff");
-    g.addColorStop(0.3,color);
-    g.addColorStop(1,"#000");
-
+// DRAW BUBBLE
+function drawBubble(x,y,color){
     ctx.beginPath();
-    ctx.arc(x,y,r,0,Math.PI*2);
-    ctx.fillStyle=g;
+    ctx.arc(x,y,SIZE,0,Math.PI*2);
+    ctx.fillStyle=color;
     ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(x-r*0.3,y-r*0.3,r*0.3,0,Math.PI*2);
-    ctx.fillStyle="rgba(255,255,255,0.4)";
-    ctx.fill();
-
-    ctx.restore();
 }
 
-// ===== DRAW =====
+// DRAW
 function draw(){
     drawBG();
 
@@ -191,52 +186,19 @@ function draw(){
         }
     }
 
-    ctx.setLineDash([5,5]);
-    ctx.strokeStyle="rgba(255,255,255,0.4)";
-    ctx.beginPath();
-    ctx.moveTo(shooter.x,shooter.y);
-    ctx.lineTo(
-        shooter.x+Math.cos(shooter.angle)*300,
-        shooter.y+Math.sin(shooter.angle)*300
-    );
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    ctx.shadowColor="#0ff";
-    ctx.shadowBlur=10;
-    ctx.strokeStyle="#0ff";
-    ctx.lineWidth=10;
-    ctx.beginPath();
-    ctx.moveTo(shooter.x,shooter.y);
-    ctx.lineTo(
-        shooter.x+Math.cos(shooter.angle)*50,
-        shooter.y+Math.sin(shooter.angle)*50
-    );
-    ctx.stroke();
-    ctx.shadowBlur=0;
-
     if(current) drawBubble(current.x,current.y,current.color);
-
-    if(next){
-        ctx.fillText("Next:",10,500);
-        drawBubble(80,490,next.color);
-    }
-
-    drawFX();
 
     if(gameOver){
         sendEarnings();
 
-        ctx.fillStyle="rgba(0,0,0,0.8)";
+        ctx.fillStyle="rgba(0,0,0,0.7)";
         ctx.fillRect(0,0,canvas.width,canvas.height);
         ctx.fillStyle="#fff";
-        ctx.font="26px Arial";
-        ctx.fillText("GAME OVER",120,250);
-        ctx.fillText("Score: "+score,140,300);
+        ctx.fillText("GAME OVER",150,250);
     }
 }
 
-// ===== SEND EARNINGS =====
+// ===== EARNINGS (UPDATED SYSTEM) =====
 function sendEarnings(){
     if(submitted) return;
     submitted = true;
@@ -244,195 +206,60 @@ function sendEarnings(){
     let duration = Math.floor((Date.now() - startTime)/1000);
     if(duration < 3) return;
 
-    fetch("../api/earn.php",{
+    let earned = (duration * 0.02).toFixed(2); // simple rate
+
+    fetch("../save_earnings.php",{
         method:"POST",
-        headers:{"Content-Type":"application/x-www-form-urlencoded"},
-        body:"duration="+duration+"&score="+score
-    })
-    .then(res=>res.json())
-    .then(data=>{
-        let popup=document.getElementById("popup");
-        popup.style.display="block";
-
-        if(data.status==="credited"){
-            popup.innerHTML="💰 Earned: "+data.currency+" "+parseFloat(data.amount).toFixed(2);
-        }else{
-            popup.innerHTML="👤 Guest: "+data.currency+" "+parseFloat(data.amount).toFixed(2)+"<br>Login to claim!";
-        }
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            game:"Bubble Shooter",
+            amount: earned
+        })
     });
+
+    let popup=document.getElementById("popup");
+    popup.style.display="block";
+
+    popup.innerHTML = `
+        <h3><i class="fa-solid fa-coins"></i> Earnings</h3>
+        <p>You earned <strong>${earned}</strong></p>
+        <p style="color:#666;">Login required to withdraw</p>
+    `;
 }
 
-// ===== EFFECTS =====
-function drawFX(){
-    for(let i=effects.length-1;i>=0;i--){
-        let e=effects[i];
-        drawBubble(e.x,e.y,"#fff",1+(20-e.life)/10,e.life/20);
-        e.life--;
-        if(e.life<=0) effects.splice(i,1);
-    }
-}
-
-// ===== SHOOT =====
-function shoot(){
-    if(current.speed||gameOver)return;
-
-    if(sound){
-        shootS.currentTime=0;
-        shootS.play().catch(()=>{});
-    }
-
-    current.speed=10;
-    current.angle=shooter.angle;
-}
-
-// ===== UPDATE =====
+// UPDATE
 function update(){
     if(!current || !current.speed || gameOver) return;
 
     current.x += Math.cos(current.angle)*current.speed;
     current.y += Math.sin(current.angle)*current.speed;
 
-    if(current.x < SIZE || current.x > canvas.width-SIZE){
-        current.angle = Math.PI - current.angle;
-    }
-
-    if(current.y < 40){
-        place();
-        return;
-    }
-
-    for(let r=0;r<ROWS;r++){
-        for(let c=0;c<COLS;c++){
-            if(grid[r][c]){
-                let dx=current.x-(c*45+40);
-                let dy=current.y-(r*45+40);
-                if(Math.sqrt(dx*dx+dy*dy)<SIZE*2){
-                    place();
-                    return;
-                }
-            }
-        }
-    }
+    if(current.y < 40) gameOver=true;
 }
 
-// ===== PLACE =====
-function place(){
-    let col=Math.round((current.x-40)/45);
-    let row=Math.round((current.y-40)/45);
-
-    col=Math.max(0,Math.min(COLS-1,col));
-    row=Math.max(0,Math.min(ROWS-1,row));
-
-    grid[row][col]=current.color;
-
-    match(row,col);
-
-    current=next;
-    next={x:210,y:480,color:rand(),speed:0};
-
-    if(row>=ROWS-1) gameOver=true;
+// SHOOT
+function shoot(){
+    if(current.speed||gameOver)return;
+    current.speed=10;
+    current.angle=shooter.angle;
 }
 
-// ===== MATCH =====
-function match(r,c){
-    let color=grid[r][c];
-    let stack=[[r,c]],seen={},m=[];
-
-    while(stack.length){
-        let [y,x]=stack.pop();
-        let k=y+"_"+x;
-        if(seen[k]) continue;
-        seen[k]=true;
-
-        if(grid[y] && grid[y][x]===color){
-            m.push([y,x]);
-            [[1,0],[-1,0],[0,1],[0,-1]].forEach(d=>stack.push([y+d[0],x+d[1]]));
-        }
-    }
-
-    if(m.length>=3){
-        if(sound){
-            popS.currentTime=0;
-            popS.play().catch(()=>{});
-        }
-
-        m.forEach(([y,x])=>{
-            effects.push({x:x*45+40,y:y*45+40,life:20});
-            grid[y][x]=null;
-        });
-
-        score+=m.length*10;
-        scoreEl.innerText=score;
-
-        drop();
-    }
-}
-
-// ===== DROP =====
-function drop(){
-    let vis={};
-
-    function dfs(r,c){
-        let k=r+"_"+c;
-        if(vis[k]||!grid[r]||!grid[r][c]) return;
-        vis[k]=true;
-        [[1,0],[-1,0],[0,1],[0,-1]].forEach(d=>dfs(r+d[0],c+d[1]));
-    }
-
-    for(let c=0;c<COLS;c++) if(grid[0][c]) dfs(0,c);
-
-    for(let r=0;r<ROWS;r++){
-        for(let c=0;c<COLS;c++){
-            if(grid[r][c] && !vis[r+"_"+c]){
-                grid[r][c]=null;
-                score+=5;
-            }
-        }
-    }
-}
-
-// ===== INPUT =====
-function pos(e){
-    let r=canvas.getBoundingClientRect();
-    return {
-        x:(e.clientX-r.left)*(canvas.width/r.width),
-        y:(e.clientY-r.top)*(canvas.height/r.height)
-    };
-}
-
+// CONTROLS
 canvas.addEventListener("mousemove",e=>{
-    let p=pos(e);
-    shooter.angle=Math.atan2(p.y-shooter.y,p.x-shooter.x);
+    let r=canvas.getBoundingClientRect();
+    let x=e.clientX-r.left;
+    let y=e.clientY-r.top;
+    shooter.angle=Math.atan2(y-480,x-210);
 });
+
 canvas.addEventListener("click",shoot);
 
-let touching=false;
-canvas.addEventListener("touchstart",e=>{
-    e.preventDefault();
-    touching=true;
-    let p=pos(e.touches[0]);
-    shooter.angle=Math.atan2(p.y-shooter.y,p.x-shooter.x);
-},{passive:false});
-
-canvas.addEventListener("touchmove",e=>{
-    e.preventDefault();
-    if(!touching) return;
-    let p=pos(e.touches[0]);
-    shooter.angle=Math.atan2(p.y-shooter.y,p.x-shooter.x);
-},{passive:false});
-
-canvas.addEventListener("touchend",e=>{
-    e.preventDefault();
-    touching=false;
-    shoot();
-},{passive:false});
-
-// ===== RESTART =====
+// RESTART
 function restartGame(){
     score=0;
     gameOver=false;
     submitted=false;
-    startTime = Date.now();
+    startTime=Date.now();
     init();
     current={x:210,y:480,color:rand(),speed:0};
     next={x:210,y:480,color:rand(),speed:0};
@@ -445,14 +272,11 @@ current={x:210,y:480,color:rand(),speed:0};
 next={x:210,y:480,color:rand(),speed:0};
 
 function loop(){
-    if(!gameOver){
-        update();
-    }
+    update();
     draw();
     requestAnimationFrame(loop);
 }
 loop();
 </script>
 
-</body>
-</html>
+<?php include "../inc/footer.php"; ?>
