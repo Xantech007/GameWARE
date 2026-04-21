@@ -2,7 +2,7 @@
 include "inc/header.php";
 include "inc/navbar.php";
 
-/* CONNECT DB (if not already connected in header) */
+/* CONNECT DB */
 if (!isset($conn)) {
     require_once "config/database.php";
     $db = new Database();
@@ -19,105 +19,113 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
+/* Mobile-First Design */
+* {
+    box-sizing: border-box;
+}
+
 .container {
     max-width: 1200px;
     margin: auto;
-    padding: 20px;
+    padding: 15px;
 }
 
 /* HEADER */
 .page-header {
     text-align: center;
     margin-top: 40px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 .page-header h1 {
-    font-size: 36px;
-    margin-bottom: 10px;
+    font-size: 32px;
+    margin-bottom: 8px;
 }
 .page-header p {
     color: #555;
-    font-size: 18px;
+    font-size: 17px;
 }
 
 /* NOTICE */
 .notice {
     background: #fff3cd;
     color: #856404;
-    padding: 12px 20px;
-    border-radius: 8px;
+    padding: 14px 20px;
+    border-radius: 10px;
     margin-bottom: 30px;
     text-align: center;
-    font-size: 15px;
-    display: none; /* Hidden by default - shown only for guests */
+    font-size: 15.5px;
+    display: none;
 }
 
 /* GRID */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 25px;
-    margin-top: 20px;
+    gap: 22px;
+    margin-top: 10px;
 }
 
 /* CARD */
 .card {
     background: #fff;
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
     transition: 0.3s ease;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.07);
     display: flex;
     flex-direction: column;
 }
 .card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    transform: translateY(-6px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
 }
 .card img {
     width: 100%;
-    height: 160px;
+    height: 170px;
     object-fit: cover;
 }
 
 /* CONTENT */
 .card-body {
-    padding: 18px;
+    padding: 18px 20px;
     flex: 1;
 }
 .card h3 {
-    margin: 8px 0 10px;
+    margin: 8px 0 12px;
     font-size: 20px;
+    line-height: 1.3;
 }
 .card p {
     color: #666;
-    font-size: 14.5px;
-    line-height: 1.5;
+    font-size: 15px;
+    line-height: 1.55;
 }
 
 /* BADGE */
 .badge {
     display: inline-block;
-    padding: 5px 10px;
+    padding: 6px 12px;
     background: #e0f2fe;
     color: #0369a1;
-    border-radius: 6px;
-    font-size: 13px;
-    margin-top: 8px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    margin-top: 10px;
 }
 
 /* BUTTON */
 .play-btn {
     display: block;
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     text-align: center;
     background: #00aaff;
     color: #fff;
-    border-radius: 8px;
+    border-radius: 10px;
     text-decoration: none;
     font-weight: 600;
+    font-size: 16px;
     transition: 0.3s;
+    margin-top: auto;
 }
 .play-btn:hover {
     background: #0088cc;
@@ -125,6 +133,33 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 /* ICON COLORS */
 .icon-blue { color: #00aaff; }
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .page-header h1 {
+        font-size: 28px;
+    }
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .card img {
+        height: 160px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 12px;
+    }
+    .card-body {
+        padding: 16px 18px;
+    }
+    .play-btn {
+        padding: 15px;
+        font-size: 16.5px;
+    }
+}
 </style>
 
 <div class="container">
@@ -148,7 +183,9 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php if (count($games) > 0): ?>
             <?php foreach ($games as $game): ?>
                 <div class="card">
-                    <img src="<?php echo htmlspecialchars($game['thumbnail']); ?>" alt="<?php echo htmlspecialchars($game['name']); ?>">
+                    <img src="<?php echo htmlspecialchars($game['thumbnail']); ?>" 
+                         alt="<?php echo htmlspecialchars($game['name']); ?>">
+                    
                     <div class="card-body">
                         <h3><?php echo htmlspecialchars($game['name']); ?></h3>
                         <p>Play instantly and earn real rewards based on your performance.</p>
@@ -156,7 +193,8 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <i class="fa-solid fa-coins"></i> Earn $
                         </span>
                     </div>
-                    <div class="card-footer" style="padding:15px;">
+
+                    <div class="card-footer" style="padding: 18px 20px 20px;">
                         <a class="play-btn" href="<?php echo htmlspecialchars($game['file_path']); ?>">
                             <i class="fa-solid fa-play"></i> Play Now
                         </a>
@@ -164,8 +202,8 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <p style="text-align:center; grid-column: 1 / -1; padding: 40px;">
-                No games available at the moment. Please check back later.
+            <p style="text-align:center; grid-column: 1 / -1; padding: 60px 20px; font-size: 17px;">
+                No games available at the moment.<br>Please check back later.
             </p>
         <?php endif; ?>
     </div>
