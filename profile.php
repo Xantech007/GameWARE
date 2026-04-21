@@ -14,11 +14,15 @@ if(!isset($_SESSION['user_id'])){
 $user_id = $_SESSION['user_id'];
 
 /* FETCH USER */
-$stmt = $pdo->prepare("SELECT full_name, username, email, phone, gender, address, country FROM users WHERE id=?");
+$stmt = $conn->prepare("SELECT full_name, username, email, phone, gender, address, country FROM users WHERE id=?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-/* UPDATE */
+if(!$user){
+    die("User not found");
+}
+
+/* UPDATE PROFILE */
 $success = "";
 $error = "";
 
@@ -28,13 +32,13 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $username  = trim($_POST['username']);
     $email     = trim($_POST['email']);
     $phone     = !empty($_POST['phone']) ? trim($_POST['phone']) : null;
-    $gender    = $_POST['gender'];
+    $gender    = $_POST['gender'] ?? null;
     $address   = trim($_POST['address']);
-    $country   = $_POST['country'];
+    $country   = $_POST['country'] ?? null;
 
     try{
 
-        $stmt = $pdo->prepare("
+        $stmt = $conn->prepare("
             UPDATE users 
             SET full_name=?, username=?, email=?, phone=?, gender=?, address=?, country=? 
             WHERE id=?
@@ -53,8 +57,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
         $success = "Profile updated successfully";
 
-        // Refresh data
-        $stmt = $pdo->prepare("SELECT full_name, username, email, phone, gender, address, country FROM users WHERE id=?");
+        // Refresh user data
+        $stmt = $conn->prepare("SELECT full_name, username, email, phone, gender, address, country FROM users WHERE id=?");
         $stmt->execute([$user_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -67,30 +71,83 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 <?php include "inc/header.php"; ?>
 <?php include "inc/navbar.php"; ?>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
-.container{max-width:800px;margin:auto;padding:20px;}
+.container{
+    max-width:800px;
+    margin:auto;
+    padding:20px;
+}
+
 .profile-box{
-    background:#fff;padding:25px;border-radius:12px;
-    box-shadow:0 5px 15px rgba(0,0,0,0.05);margin-top:40px;
+    background:#fff;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.05);
+    margin-top:40px;
 }
-.form-group{margin-bottom:15px;}
-.form-group label{display:block;margin-bottom:5px;font-weight:500;}
-.form-group input,.form-group select,.form-group textarea{
-    width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;
+
+.profile-box h2{
+    margin-bottom:20px;
 }
-.btn{padding:10px 18px;border:none;background:#00aaff;color:#fff;border-radius:6px;cursor:pointer;}
-.btn-dark{background:#222;}
-.success{color:green;margin-bottom:10px;}
-.error{color:red;margin-bottom:10px;}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:5px;
+    font-weight:500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:6px;
+}
+
+.btn{
+    padding:10px 18px;
+    border:none;
+    background:#00aaff;
+    color:#fff;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.btn-dark{
+    background:#222;
+}
+
+.success{
+    color:green;
+    margin-bottom:10px;
+}
+
+.error{
+    color:red;
+    margin-bottom:10px;
+}
 </style>
 
 <div class="container">
 
 <div class="profile-box">
-<h2>My Profile</h2>
 
-<?php if($success): ?><div class="success"><?php echo $success; ?></div><?php endif; ?>
-<?php if($error): ?><div class="error"><?php echo $error; ?></div><?php endif; ?>
+<h2><i class="fa-solid fa-user"></i> My Profile</h2>
+
+<?php if($success): ?>
+    <div class="success"><?php echo $success; ?></div>
+<?php endif; ?>
+
+<?php if($error): ?>
+    <div class="error"><?php echo $error; ?></div>
+<?php endif; ?>
 
 <form method="POST">
 
@@ -117,21 +174,21 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 <div class="form-group">
 <label>Gender</label>
 <select name="gender">
-<option value="">Select</option>
-<option value="Male" <?php if($user['gender']=='Male') echo 'selected'; ?>>Male</option>
-<option value="Female" <?php if($user['gender']=='Female') echo 'selected'; ?>>Female</option>
+    <option value="">Select</option>
+    <option value="Male" <?php if($user['gender']=='Male') echo 'selected'; ?>>Male</option>
+    <option value="Female" <?php if($user['gender']=='Female') echo 'selected'; ?>>Female</option>
 </select>
 </div>
 
 <div class="form-group">
 <label>Country</label>
-<select name="country" required>
-<option value="">Select Country</option>
-<?php foreach($countries as $c): ?>
-    <option value="<?php echo $c; ?>" <?php if($user['country']==$c) echo 'selected'; ?>>
-        <?php echo $c; ?>
-    </option>
-<?php endforeach; ?>
+<select name="country">
+    <option value="">Select Country</option>
+    <?php foreach($countries as $c): ?>
+        <option value="<?php echo $c; ?>" <?php if($user['country']==$c) echo 'selected'; ?>>
+            <?php echo $c; ?>
+        </option>
+    <?php endforeach; ?>
 </select>
 </div>
 
@@ -142,10 +199,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
 <br>
 
-<button type="submit" class="btn">Save Changes</button>
+<button type="submit" class="btn">
+    <i class="fa-solid fa-save"></i> Save Changes
+</button>
 
 <a href="change-password.php" class="btn btn-dark" style="margin-left:10px;">
-Change Password
+    <i class="fa-solid fa-key"></i> Change Password
 </a>
 
 </form>
