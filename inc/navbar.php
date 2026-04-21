@@ -128,6 +128,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </a>
             <?php endif; ?>
 
+                 <!-- PROFILE -->
+                <?php if($current_page !== 'profile.php'): ?>
+                    <a href="/profile.php">
+                        <i class="fa-solid fa-user"></i> Profile
+                    </a>
+                <?php endif; ?>
+        
             <!-- WALLET (always before logout) -->
             <span class="balance">
                 <i class="fa-solid fa-wallet"></i>
