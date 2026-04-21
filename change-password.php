@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
             $stmt->execute([$hashed_password, $user_id]);
 
-            // Set success message and redirect to profile
+            // Set success message and redirect
             $_SESSION['success_message'] = "Password changed successfully!";
             header("Location: profile.php");
             exit;
@@ -62,18 +62,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
+/* Mobile-First Design */
+* {
+    box-sizing: border-box;
+}
+
 .container {
     max-width: 620px;
     margin: auto;
-    padding: 20px;
+    padding: 15px;
 }
 
 .password-box {
     background: #fff;
-    padding: 40px;
+    padding: 35px 25px;
     border-radius: 16px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    margin-top: 40px;
+    margin-top: 30px;
 }
 
 .password-box h2 {
@@ -90,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     background: #fee2e2;
     color: #ef4444;
     padding: 14px 18px;
-    border-radius: 8px;
+    border-radius: 10px;
     margin-bottom: 25px;
     font-weight: 500;
     display: flex;
@@ -111,24 +116,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 .form-group input {
     width: 100%;
     padding: 14px 16px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 10px;
     font-size: 16px;
     transition: all 0.3s;
 }
 .form-group input:focus {
     outline: none;
     border-color: #00aaff;
-    box-shadow: 0 0 0 3px rgba(0, 170, 255, 0.15);
+    box-shadow: 0 0 0 4px rgba(0, 170, 255, 0.12);
 }
 
 /* BUTTONS */
 .btn {
-    padding: 14px 28px;
+    padding: 15px 28px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 16.5px;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
@@ -149,6 +154,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 .btn-secondary:hover {
     background: #111827;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .password-box {
+        padding: 28px 20px;
+        margin-top: 20px;
+    }
+    .password-box h2 {
+        font-size: 26px;
+    }
+    .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 16px;
+    }
+    .btn-secondary {
+        margin-top: 12px;
+        margin-left: 0 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 12px;
+    }
 }
 </style>
 
