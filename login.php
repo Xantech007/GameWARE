@@ -1,177 +1,229 @@
-<?php 
-include "inc/header.php";
+<?php
+/* SESSION SAFE START */
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once "config/database.php";
+
+/* CONNECT DB */
+$db = new Database();
+$conn = $db->connect();
 
 $message = "";
 
-if($_SERVER['REQUEST_METHOD'] === 'POST'){
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email    = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
 
-    if($email && $password){
-
-        $stmt = $conn->prepare("SELECT * FROM users WHERE email=? LIMIT 1");
+    if ($email && $password) {
+        $stmt = $conn->prepare("SELECT id, password, balance FROM users WHERE email = ? LIMIT 1");
         $stmt->execute([$email]);
-        $user = $stmt->fetch();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if($user && password_verify($password, $user['password'])){
+        if ($user && password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['balance'] = $user['balance'];
-
+            $_SESSION['balance'] = $user['balance'] ?? 0;
+            
             header("Location: index.php");
             exit;
         } else {
-            $message = "<div class='error'>
-                <i class='fa-solid fa-circle-exclamation'></i> Invalid email or password
-            </div>";
+            $message = '<div class="error">
+                <i class="fa-solid fa-circle-exclamation"></i> Invalid email or password
+            </div>';
         }
-
     } else {
-        $message = "<div class='error'>All fields are required</div>";
+        $message = '<div class="error">
+            <i class="fa-solid fa-circle-exclamation"></i> All fields are required
+        </div>';
     }
 }
 ?>
 
+<?php include "inc/header.php"; ?>
+<?php include "inc/navbar.php"; ?>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-.auth-wrapper{
-    min-height:80vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:#f5fbff;
+/* Mobile-First Design */
+* {
+    box-sizing: border-box;
 }
 
-.auth-card{
-    width:100%;
-    max-width:400px;
-    background:#fff;
-    padding:30px;
-    border-radius:12px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.08);
-    text-align:center;
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    padding: 20px 15px;
 }
 
-/* LOGO */
-.logo img{
-    width:60px;
-    margin-bottom:10px;
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    padding: 35px 25px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
-/* TITLE */
-.auth-card h2{
-    margin-bottom:5px;
+/* Logo */
+.logo img {
+    width: 68px;
+    height: 68px;
+    margin-bottom: 15px;
 }
 
-.subtitle{
-    color:#777;
-    font-size:14px;
-    margin-bottom:20px;
+/* Title */
+.auth-card h2 {
+    font-size: 28px;
+    margin-bottom: 6px;
+    color: #1f2937;
 }
 
-/* INPUTS */
-.input-group{
-    position:relative;
-    margin-bottom:15px;
+.subtitle {
+    color: #64748b;
+    font-size: 15.5px;
+    margin-bottom: 25px;
 }
 
-.input-group i{
-    position:absolute;
-    left:12px;
-    top:50%;
-    transform:translateY(-50%);
-    color:#999;
+/* Error Message */
+.error {
+    background: #fee2e2;
+    color: #ef4444;
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: left;
 }
 
-.input-group input{
-    width:100%;
-    padding:10px 10px 10px 35px;
-    border:1px solid #ddd;
-    border-radius:6px;
-    outline:none;
-    transition:0.2s;
+/* Input Groups */
+.input-group {
+    position: relative;
+    margin-bottom: 18px;
+}
+.input-group i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 18px;
+    z-index: 2;
+}
+.input-group input {
+    width: 100%;
+    padding: 14px 14px 14px 48px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: #fff;
+}
+.input-group input:focus {
+    outline: none;
+    border-color: #00aaff;
+    box-shadow: 0 0 0 4px rgba(0, 170, 255, 0.12);
 }
 
-.input-group input:focus{
-    border-color:#00aaff;
+/* Button */
+.btn {
+    width: 100%;
+    padding: 15px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 10px;
+    background: #00aaff;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.btn:hover {
+    background: #0088cc;
+    transform: translateY(-2px);
 }
 
-/* BUTTON */
-.btn{
-    width:100%;
-    padding:10px;
-    border:none;
-    border-radius:6px;
-    background:#00aaff;
-    color:#fff;
-    font-weight:bold;
-    cursor:pointer;
-    transition:0.2s;
+/* Footer Text */
+.bottom-text {
+    margin-top: 25px;
+    font-size: 15px;
+    color: #64748b;
+}
+.bottom-text a {
+    color: #00aaff;
+    font-weight: 500;
+    text-decoration: none;
+}
+.bottom-text a:hover {
+    text-decoration: underline;
 }
 
-.btn:hover{
-    background:#008ecc;
-}
-
-/* MESSAGES */
-.error{
-    background:#ffe6e6;
-    color:#c00;
-    padding:10px;
-    border-radius:6px;
-    margin-bottom:15px;
-}
-
-/* FOOT */
-.bottom-text{
-    margin-top:15px;
-    font-size:14px;
-}
-
-.bottom-text a{
-    color:#00aaff;
-    text-decoration:none;
+/* Mobile Optimizations */
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 30px 20px;
+        border-radius: 14px;
+    }
+    .auth-card h2 {
+        font-size: 26px;
+    }
+    .input-group input {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 16px 16px 16px 50px;
+    }
+    .btn {
+        padding: 16px;
+        font-size: 17px;
+    }
 }
 </style>
 
 <div class="auth-wrapper">
-
-<div class="auth-card">
-
-    <!-- LOGO -->
-    <div class="logo">
-        <img src="assets/images/logo.png" alt="Logo">
-    </div>
-
-    <h2>Welcome Back</h2>
-    <div class="subtitle">Login to continue playing & earning</div>
-
-    <?php echo $message; ?>
-
-    <form method="POST">
-
-        <div class="input-group">
-            <i class="fa-solid fa-envelope"></i>
-            <input name="email" type="email" placeholder="Email Address" required>
+    <div class="auth-card">
+        <!-- Logo -->
+        <div class="logo">
+            <img src="assets/images/logo.png" alt="Logo">
         </div>
 
-        <div class="input-group">
-            <i class="fa-solid fa-lock"></i>
-            <input name="password" type="password" placeholder="Password" required>
+        <h2>Welcome Back</h2>
+        <div class="subtitle">Login to continue playing & earning real money</div>
+
+        <?php echo $message; ?>
+
+        <form method="POST">
+            <div class="input-group">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" name="email" placeholder="Email Address" required>
+            </div>
+
+            <div class="input-group">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+
+            <button type="submit" class="btn">
+                <i class="fa-solid fa-right-to-bracket"></i> 
+                Sign In
+            </button>
+        </form>
+
+        <div class="bottom-text">
+            Don’t have an account? 
+            <a href="register.php">Create Free Account</a>
         </div>
-
-        <button class="btn">
-            <i class="fa-solid fa-right-to-bracket"></i> Login
-        </button>
-
-    </form>
-
-    <div class="bottom-text">
-        Don’t have an account? <a href="register.php">Register</a>
     </div>
-
-</div>
-
 </div>
 
 <?php include "inc/footer.php"; ?>
