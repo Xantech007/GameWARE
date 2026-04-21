@@ -16,29 +16,28 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-/* VARIABLES */
-$success = "";
-$error = "";
-
 /* HANDLE PASSWORD CHANGE */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $current_password = $_POST['current_password'] ?? '';
-    $new_password = $_POST['new_password'] ?? '';
+    $new_password     = $_POST['new_password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
 
     try {
-        // Fetch current hashed password
+        // Fetch current password hash
         $stmt = $conn->prepare("SELECT password FROM users WHERE id = ?");
         $stmt->execute([$user_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$user || !password_verify($current_password, $user['password'])) {
             $error = "Current password is incorrect.";
-        } elseif (strlen($new_password) < 6) {
+        } 
+        elseif (strlen($new_password) < 6) {
             $error = "New password must be at least 6 characters long.";
-        } elseif ($new_password !== $confirm_password) {
+        } 
+        elseif ($new_password !== $confirm_password) {
             $error = "New password and confirmation do not match.";
-        } else {
+        } 
+        else {
             // Hash new password
             $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
 
@@ -46,7 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
             $stmt->execute([$hashed_password, $user_id]);
 
-            $success = "Password changed successfully!";
+            // Set success message in session and redirect
+            $_SESSION['success_message'] = "Password changed successfully!";
+            header("Location: profile.php");
+            exit;
         }
     } catch (PDOException $e) {
         $error = "An error occurred: " . $e->getMessage();
@@ -125,14 +127,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     text-decoration: none;
 }
 
-.success {
-    color: green;
-    background: #e6f9e6;
-    padding: 12px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-}
-
 .error {
     color: red;
     background: #ffe6e6;
@@ -146,39 +140,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="password-box">
         <h2><i class="fa-solid fa-key"></i> Change Password</h2>
 
-        <?php if ($success): ?>
-            <div class="success"><?php echo $success; ?></div>
-        <?php endif; ?>
-
-        <?php if ($error): ?>
+        <?php if (isset($error)): ?>
             <div class="error"><?php echo $error; ?></div>
         <?php endif; ?>
 
         <form method="POST">
             <div class="form-group">
                 <label for="current_password">Current Password</label>
-                <input type="password" 
-                       id="current_password"
-                       name="current_password" 
-                       required>
+                <input type="password" id="current_password" name="current_password" required>
             </div>
 
             <div class="form-group">
                 <label for="new_password">New Password</label>
-                <input type="password" 
-                       id="new_password"
-                       name="new_password" 
-                       minlength="6"
-                       required>
+                <input type="password" id="new_password" name="new_password" minlength="6" required>
             </div>
 
             <div class="form-group">
                 <label for="confirm_password">Confirm New Password</label>
-                <input type="password" 
-                       id="confirm_password"
-                       name="confirm_password" 
-                       minlength="6"
-                       required>
+                <input type="password" id="confirm_password" name="confirm_password" minlength="6" required>
             </div>
 
             <br>
@@ -187,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </button>
 
             <a href="profile.php" class="btn btn-secondary" style="margin-left: 10px;">
-                <i class="fa-solid fa-arrow-left"></i> Back to Profile
+                <i class="fa-solid fa-arrow-left"></i> Cancel
             </a>
         </form>
     </div>
