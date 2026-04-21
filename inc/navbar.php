@@ -31,6 +31,28 @@ $current_page = basename($_SERVER['PHP_SELF']);
     width: auto;
 }
 
+/* CENTER - Balance */
+.nav-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 0 15px;
+}
+
+.balance {
+    background: #eaf6ff;
+    padding: 8px 18px;
+    border-radius: 25px;
+    font-size: 14.5px;
+    color: #0077aa;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
 /* RIGHT SIDE - Desktop */
 .nav-right {
     display: flex;
@@ -49,22 +71,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
     gap: 6px;
     white-space: nowrap;
 }
+
 .nav-right a:hover {
     color: #00aaff;
-}
-
-/* Balance */
-.balance {
-    background: #eaf6ff;
-    padding: 8px 14px;
-    border-radius: 25px;
-    font-size: 14.5px;
-    color: #0077aa;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
 }
 
 /* Hamburger */
@@ -77,8 +86,23 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
 /* ===================== MOBILE ===================== */
 @media (max-width: 768px) {
+    .navbar {
+        flex-wrap: wrap;
+    }
+
+    .nav-left {
+        flex: 1;
+    }
+
     .menu-toggle {
         display: block;
+    }
+
+    .nav-center {
+        order: 3;
+        width: 100%;
+        margin: 10px 0;
+        justify-content: center;
     }
 
     .nav-right {
@@ -93,22 +117,17 @@ $current_page = basename($_SERVER['PHP_SELF']);
         gap: 16px;
         box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         z-index: 999;
+        width: 100%;
     }
 
     .nav-right.show {
         display: flex;
     }
 
-    .nav-right a,
-    .balance {
+    .nav-right a {
         width: 100%;
         justify-content: center;
         padding: 10px 0;
-    }
-
-    .balance {
-        background: #f0f9ff;
-        justify-content: center;
     }
 }
 </style>
@@ -118,6 +137,25 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <a href="/index.php" class="nav-left">
         <img src="assets/images/logo.png" alt="<?php echo htmlspecialchars($site_name ?? 'PlayEarn'); ?>">
     </a>
+
+    <!-- Balance - Now in the center -->
+    <div class="nav-center">
+        <span class="balance">
+            <i class="fa-solid fa-wallet"></i>
+            <?php
+            $user_balance = 0.00;
+            if (isset($_SESSION['user_id']) && isset($conn)) {
+                $stmt = $conn->prepare("SELECT balance FROM users WHERE id = ?");
+                $stmt->execute([$_SESSION['user_id']]);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($row) {
+                    $user_balance = $row['balance'];
+                }
+            }
+            echo (\( currency ?? ' \)') . " " . number_format($user_balance, 2);
+            ?>
+        </span>
+    </div>
 
     <!-- Hamburger Menu -->
     <div class="menu-toggle" onclick="toggleMenu()">
@@ -145,23 +183,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <i class="fa-solid fa-user"></i> Profile
                 </a>
             <?php endif; ?>
-
-            <!-- Balance -->
-            <span class="balance">
-                <i class="fa-solid fa-wallet"></i>
-                <?php
-                $user_balance = 0.00;
-                if (isset($_SESSION['user_id']) && isset($conn)) {
-                    $stmt = $conn->prepare("SELECT balance FROM users WHERE id = ?");
-                    $stmt->execute([$_SESSION['user_id']]);
-                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                    if ($row) {
-                        $user_balance = $row['balance'];
-                    }
-                }
-                echo ($currency ?? '$') . " " . number_format($user_balance, 2);
-                ?>
-            </span>
 
             <!-- Logout -->
             <a href="/logout.php">
