@@ -2,6 +2,11 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+/* SESSION SAFE START */
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once "config/database.php";
 include "inc/countries.php";
 
@@ -21,9 +26,16 @@ $stmt = $conn->prepare("SELECT full_name, username, email, phone, gender, addres
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if(!$user){
-    die("User not found");
-}
+/* SAFE DEFAULTS (PREVENT NULL ERRORS) */
+$user = array_merge([
+    'full_name' => '',
+    'username'  => '',
+    'email'     => '',
+    'phone'     => '',
+    'gender'    => '',
+    'address'   => '',
+    'country'   => ''
+], $user ?: []);
 
 /* UPDATE PROFILE */
 $success = "";
@@ -60,10 +72,20 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
         $success = "Profile updated successfully";
 
-        // Refresh user data
+        /* REFRESH USER DATA */
         $stmt = $conn->prepare("SELECT full_name, username, email, phone, gender, address, country FROM users WHERE id=?");
         $stmt->execute([$user_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $user = array_merge([
+            'full_name' => '',
+            'username'  => '',
+            'email'     => '',
+            'phone'     => '',
+            'gender'    => '',
+            'address'   => '',
+            'country'   => ''
+        ], $user ?: []);
 
     }catch(PDOException $e){
         $error = "Update failed: " . $e->getMessage();
@@ -178,8 +200,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 <label>Gender</label>
 <select name="gender">
     <option value="">Select</option>
-    <option value="Male" <?php if($user['gender']=='Male') echo 'selected'; ?>>Male</option>
-    <option value="Female" <?php if($user['gender']=='Female') echo 'selected'; ?>>Female</option>
+    <option value="Male" <?php if($user['gender'] === 'Male') echo 'selected'; ?>>Male</option>
+    <option value="Female" <?php if($user['gender'] === 'Female') echo 'selected'; ?>>Female</option>
 </select>
 </div>
 
@@ -188,8 +210,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 <select name="country">
     <option value="">Select Country</option>
     <?php foreach($countries as $c): ?>
-        <option value="<?php echo $c; ?>" <?php if($user['country']==$c) echo 'selected'; ?>>
-            <?php echo $c; ?>
+        <option value="<?php echo htmlspecialchars($c); ?>" <?php if($user['country'] === $c) echo 'selected'; ?>>
+            <?php echo htmlspecialchars($c); ?>
         </option>
     <?php endforeach; ?>
 </select>
