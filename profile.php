@@ -79,18 +79,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
+/* Mobile-First Design */
+* {
+    box-sizing: border-box;
+}
+
 .container {
     max-width: 900px;
     margin: auto;
-    padding: 20px;
+    padding: 15px;
 }
 
 .profile-box {
     background: #fff;
-    padding: 35px;
+    padding: 30px 25px;
     border-radius: 16px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    margin-top: 40px;
+    margin-top: 30px;
 }
 
 .profile-box h2 {
@@ -106,17 +111,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     background: #d1fae5;
     color: #10b981;
     padding: 14px 18px;
-    border-radius: 8px;
+    border-radius: 10px;
     margin-bottom: 20px;
     font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 .error {
     background: #fee2e2;
     color: #ef4444;
     padding: 14px 18px;
-    border-radius: 8px;
+    border-radius: 10px;
     margin-bottom: 20px;
     font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* FORM STYLING */
@@ -125,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 .form-group label {
     display: block;
-    margin-bottom: 7px;
+    margin-bottom: 8px;
     font-weight: 600;
     color: #374151;
 }
@@ -133,9 +144,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 .form-group select,
 .form-group textarea {
     width: 100%;
-    padding: 13px 15px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+    padding: 14px 16px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 10px;
     font-size: 16px;
     transition: all 0.3s;
 }
@@ -144,15 +155,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 .form-group textarea:focus {
     outline: none;
     border-color: #00aaff;
-    box-shadow: 0 0 0 3px rgba(0, 170, 255, 0.15);
+    box-shadow: 0 0 0 4px rgba(0, 170, 255, 0.12);
 }
 
+/* BUTTONS */
 .btn {
-    padding: 13px 26px;
+    padding: 14px 26px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 16.5px;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
@@ -172,6 +184,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 .btn-dark:hover {
     background: #111827;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .profile-box {
+        padding: 25px 20px;
+        margin-top: 20px;
+    }
+    .profile-box h2 {
+        font-size: 26px;
+    }
+    .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 16px;
+    }
+    .btn-dark {
+        margin-top: 12px;
+        margin-left: 0 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 12px;
+    }
 }
 </style>
 
@@ -199,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         <?php endif; ?>
 
-        <h2><i class="fa-solid fa-user icon-blue" style="color:#00aaff;"></i> My Profile</h2>
+        <h2><i class="fa-solid fa-user" style="color:#00aaff;"></i> My Profile</h2>
 
         <form method="POST">
             <div class="form-group">
