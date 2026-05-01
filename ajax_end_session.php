@@ -2,15 +2,26 @@
 session_start();
 require_once "config/database.php";
 
+header('Content-Type: application/json');
+
 $data = json_decode(file_get_contents("php://input"), true);
 
-if (!isset($_SESSION['user_id'])) exit;
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(["error" => "Not logged in"]);
+    exit;
+}
+
+if (!isset($data['session_id'])) {
+    echo json_encode(["error" => "Invalid request"]);
+    exit;
+}
 
 $user_id = $_SESSION['user_id'];
 $session_id = (int)$data['session_id'];
 
 $db = new Database();
 $conn = $db->connect();
+$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 /* GET SESSION */
 $stmt = $conn->prepare("
@@ -22,16 +33,32 @@ $stmt = $conn->prepare("
 $stmt->execute([$session_id, $user_id]);
 $session = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$session) exit;
+if (!$session) {
+    echo json_encode(["error" => "Session not found"]);
+    exit;
+}
 
-/* CALCULATE (SERVER SIDE!) */
+/* IF ALREADY ENDED → RETURN STORED VALUE */
+if (!empty($session['end_time'])) {
+    echo json_encode([
+        "amount" => number_format($session['amount_earned'], 2)
+    ]);
+    exit;
+}
+
+/* CALCULATE ONLY ONCE */
 $start = strtotime($session['start_time']);
 $end = time();
 
 $duration = $end - $start;
 $amount = ($duration / 60) * $session['reward_per_min'];
 
-/* UPDATE */
+/* OPTIONAL: minimum play time (anti-cheat) */
+if ($duration < 5) {
+    $amount = 0;
+}
+
+/* UPDATE SESSION */
 $stmt = $conn->prepare("
     UPDATE game_sessions 
     SET end_time = NOW(),
