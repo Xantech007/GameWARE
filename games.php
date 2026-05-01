@@ -19,10 +19,7 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-/* Mobile-First Design */
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 .container {
     max-width: 1200px;
@@ -30,7 +27,6 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
     padding: 15px;
 }
 
-/* HEADER */
 .page-header {
     text-align: center;
     margin-top: 40px;
@@ -45,7 +41,6 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
     font-size: 17px;
 }
 
-/* NOTICE */
 .notice {
     background: #fff3cd;
     color: #856404;
@@ -54,18 +49,14 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
     margin-bottom: 30px;
     text-align: center;
     font-size: 15.5px;
-    display: none;
 }
 
-/* GRID */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 22px;
-    margin-top: 10px;
 }
 
-/* CARD */
 .card {
     background: #fff;
     border-radius: 16px;
@@ -85,7 +76,6 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
     object-fit: cover;
 }
 
-/* CONTENT */
 .card-body {
     padding: 18px 20px;
     flex: 1;
@@ -93,15 +83,12 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
 .card h3 {
     margin: 8px 0 12px;
     font-size: 20px;
-    line-height: 1.3;
 }
 .card p {
     color: #666;
     font-size: 15px;
-    line-height: 1.55;
 }
 
-/* BADGE */
 .badge {
     display: inline-block;
     padding: 6px 12px;
@@ -112,7 +99,6 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
     margin-top: 10px;
 }
 
-/* BUTTON */
 .play-btn {
     display: block;
     width: 100%;
@@ -131,33 +117,11 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
     background: #0088cc;
 }
 
-/* ICON COLORS */
 .icon-blue { color: #00aaff; }
 
-/* Mobile Optimizations */
 @media (max-width: 768px) {
-    .page-header h1 {
-        font-size: 28px;
-    }
     .grid {
         grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    .card img {
-        height: 160px;
-    }
-}
-
-@media (max-width: 480px) {
-    .container {
-        padding: 12px;
-    }
-    .card-body {
-        padding: 16px 18px;
-    }
-    .play-btn {
-        padding: 15px;
-        font-size: 16.5px;
     }
 }
 </style>
@@ -170,12 +134,12 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <p>Play exciting games and earn real money in USD</p>
     </div>
 
-    <!-- LOGIN NOTICE - Hidden when user is logged in -->
+    <!-- LOGIN NOTICE -->
     <?php if (!isset($_SESSION['user_id'])): ?>
-    <div class="notice" style="display: block;">
-        <i class="fa-solid fa-circle-info"></i>
-        <strong>Login is required</strong> to claim and withdraw your earnings.
-    </div>
+        <div class="notice">
+            <i class="fa-solid fa-circle-info"></i>
+            <strong>Login is required</strong> to earn and claim rewards.
+        </div>
     <?php endif; ?>
 
     <!-- GAMES GRID -->
@@ -188,22 +152,36 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     
                     <div class="card-body">
                         <h3><?php echo htmlspecialchars($game['name']); ?></h3>
-                        <p>Play instantly and earn real rewards based on your performance.</p>
+
+                        <p>Play and earn based on time spent.</p>
+
                         <span class="badge">
-                            <i class="fa-solid fa-coins"></i> Earn $
+                            <i class="fa-solid fa-coins"></i> 
+                            $<?php echo number_format($game['reward_per_min'], 4); ?>/min
                         </span>
                     </div>
 
-                    <div class="card-footer" style="padding: 18px 20px 20px;">
-                        <a class="play-btn" href="<?php echo htmlspecialchars($game['file_path']); ?>">
-                            <i class="fa-solid fa-play"></i> Play Now
-                        </a>
+                    <div style="padding: 18px 20px 20px;">
+
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                            <!-- PLAY VIA play.php -->
+                            <a class="play-btn" 
+                               href="play.php?game_id=<?php echo $game['id']; ?>">
+                                <i class="fa-solid fa-play"></i> Play Now
+                            </a>
+                        <?php else: ?>
+                            <!-- FORCE LOGIN -->
+                            <a class="play-btn" href="login.php">
+                                <i class="fa-solid fa-lock"></i> Login to Play
+                            </a>
+                        <?php endif; ?>
+
                     </div>
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <p style="text-align:center; grid-column: 1 / -1; padding: 60px 20px; font-size: 17px;">
-                No games available at the moment.<br>Please check back later.
+            <p style="text-align:center; grid-column: 1 / -1; padding: 60px;">
+                No games available at the moment.
             </p>
         <?php endif; ?>
     </div>
