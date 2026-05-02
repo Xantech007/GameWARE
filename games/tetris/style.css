@@ -1,89 +1,137 @@
+/* RESET */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-  overflow: hidden;
-  background: #d7d7d7;
+  background: #111;
+  font-family: Arial, sans-serif;
+  color: #fff;
+  text-align: center;
 }
+
+/* WRAPPER */
+#game-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+}
+
+/* GAME CONTAINER */
 #tetris {
-  width: 360px;
-  border: 1px solid black;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
+/* GAME BOARD */
 #canvas {
   width: 200px;
   height: 440px;
-  background-color: #000;
+  background: #000;
   position: relative;
-  color: #fff;
+  border: 2px solid #444;
+  margin: 10px auto;
 }
+
+/* GAME OVER TEXT */
 #canvas h1 {
-  margin: 0;
-  padding: 0;
   text-align: center;
-  font-size: 30px;
-  padding-top: 200px;
-}
-.piece {
-  border: 1px solid white;
-  position: absolute;
+  font-size: 24px;
+  margin-top: 180px;
 }
 
-#start {
-  animation: blink 0.7s steps(2, start) infinite;
-  background: #e1ff5f;
-  border-radius: 2px;
-  color: #202020;
-  cursor: pointer;
-  font-size: 28px;
-}
-
-@keyframes blink {
-  to {
-    outline: #e1ff5f solid 1px;
-  }
-}
-
-.red {
-  color: #f00000;
-}
-
+/* BLOCKS */
 .square {
   position: absolute;
-  width: 19px;
-  height: 19px;
-  border: 1px solid white;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #222;
 }
-.type0 {
-  background-color: #a000f0;
-}
-.type1 {
-  background-color: #00f0f0;
-}
-.type2 {
-  background-color: #f0a000;
-}
-.type3 {
-  background-color: #0000f0;
-}
-.type4 {
-  background-color: #00f000;
-}
-.type5 {
-  background-color: #f00000;
-}
-.type6 {
-  background-color: #f0f000;
-}
-#next_shape {
-  position: relative;
-  background-color: #000;
-  border: 1px solid white;
-  width: 110px;
-  height: 110px;
-}
+
+/* COLORS */
+.type0 { background: #a000f0; }
+.type1 { background: #00f0f0; }
+.type2 { background: #f0a000; }
+.type3 { background: #0000f0; }
+.type4 { background: #00f000; }
+.type5 { background: #f00000; }
+.type6 { background: #f0f000; }
+
+/* INFO PANEL */
 #info {
-  background-color: #000;
-  color: #fff;
-  float: right;
-  width: 110px;
-  height: 420px;
+  margin-top: 10px;
+  background: #000;
   padding: 10px;
+  border-radius: 10px;
+  width: 200px;
+}
+
+#info p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+/* NEXT SHAPE */
+#next_shape {
+  background: #000;
+  border: 1px solid #444;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 10px;
+  position: relative;
+}
+
+/* START BUTTON */
+#start {
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 16px;
+  background: #00aaff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* MOBILE CONTROLS */
+#controls {
+  position: fixed;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+#controls button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 20px;
+  background: #222;
+  color: #fff;
+  border: none;
+}
+
+/* DESKTOP VIEW */
+@media (min-width: 768px) {
+  #game-wrapper {
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 30px;
+  }
+
+  #info {
+    width: 150px;
+  }
+
+  #controls {
+    display: none;
+  }
 }
