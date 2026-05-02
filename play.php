@@ -132,20 +132,6 @@ button:hover {
 </div>
 
 <script>
-let seconds = 0;
-let rewardPerMin = <?php echo $reward_per_min; ?>;
-let earned = 0;
-
-// TRACK TIME
-setInterval(() => {
-    seconds++;
-    document.getElementById("time").innerText = seconds;
-
-    earned = (seconds / 60) * rewardPerMin;
-    document.getElementById("earnings").innerText = earned.toFixed(4);
-}, 1000);
-
-// CLAIM FUNCTION
 function claimReward() {
 
     if (earned <= 0) {
@@ -160,12 +146,29 @@ function claimReward() {
         },
         body: "amount=" + earned.toFixed(4)
     })
-    .then(res => res.text())
+    .then(res => res.json())
     .then(data => {
-        alert(data);
 
-        // 🔥 FORCE FULL PAGE REFRESH (updates navbar balance)
-        window.location.reload();
+        if (data.status === "success") {
+
+            // ✅ Update navbar balance instantly
+            const navBalance = document.getElementById("navBalance");
+            if (navBalance) {
+                navBalance.innerText = "$" + data.new_balance;
+            }
+
+            alert(data.message);
+
+            // RESET GAME STATS
+            seconds = 0;
+            earned = 0;
+            document.getElementById("time").innerText = 0;
+            document.getElementById("earnings").innerText = "0.0000";
+
+        } else {
+            alert(data.message);
+        }
+
     })
     .catch(() => {
         alert("Something went wrong.");
