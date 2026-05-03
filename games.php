@@ -24,9 +24,7 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark" />
 
-    <!-- GameWARE Assets (Updated) -->
     <link rel="icon" type="image/png" href="assets/favicon.png" />
-
     <link rel="stylesheet" href="style.css" />
 
     <!-- Font Awesome -->
@@ -34,35 +32,124 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <style>
         * { box-sizing: border-box; }
-        .container { max-width: 1200px; margin: auto; padding: 15px; }
-        .page-header { text-align: center; margin: 40px 0 25px; }
-        .page-header h1 { font-size: 32px; margin-bottom: 8px; }
-        .notice {
-            background: #fff3cd; color: #856404; padding: 14px 20px;
-            border-radius: 10px; margin-bottom: 30px; text-align: center;
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 15px;
         }
+
+        .page-header {
+            text-align: center;
+            margin: 40px 0 25px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .notice {
+            background: #fff3cd;
+            color: #856404;
+            padding: 14px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 22px;
             margin-top: 20px;
         }
+
         .card {
-            background: #fff; border-radius: 16px; overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.07); transition: 0.3s;
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.07);
+            transition: 0.3s;
         }
-        .card:hover { transform: translateY(-6px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
-        .card img { width: 100%; height: 170px; object-fit: cover; }
-        .card-body { padding: 18px 20px; flex: 1; }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+        }
+
+        .card img {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 18px 20px;
+            flex: 1;
+        }
+
         .play-btn {
-            display: block; width: 100%; padding: 14px; text-align: center;
-            background: #00aaff; color: #fff; border-radius: 10px;
-            text-decoration: none; font-weight: 600; margin-top: 15px;
+            display: block;
+            width: 100%;
+            padding: 14px;
+            text-align: center;
+            background: #00aaff;
+            color: #fff;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 15px;
         }
-        .play-btn:hover { background: #0088cc; }
+
+        .play-btn:hover {
+            background: #0088cc;
+        }
+
+        /* Game mode button */
+        #toggleGameMode {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 99999;
+            padding: 12px 16px;
+            background: #111;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        #toggleGameMode:hover {
+            background: #222;
+        }
+
+        /* Hide layout in game mode */
+        body.game-mode header,
+        body.game-mode nav,
+        body.game-mode footer {
+            display: none !important;
+        }
+
+        body.game-mode main {
+            width: 100%;
+            max-width: 100%;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        body.game-mode .container {
+            max-width: 100%;
+            padding: 0;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Game mode toggle -->
+    <button id="toggleGameMode">🎮 Game Mode</button>
 
     <div class="loader" id="loader" style="display:none;">Loading Game...</div>
 
@@ -92,6 +179,7 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="card-body">
                                 <h3><?= htmlspecialchars($game['name']) ?></h3>
                                 <p>Play and earn based on time spent.</p>
+
                                 <?php if (!empty($game['reward_per_min'])): ?>
                                 <strong style="color:#00aa00;">
                                     $<?= number_format($game['reward_per_min'], 4) ?>/min
@@ -100,7 +188,8 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
 
                             <div style="padding: 0 20px 20px;">
-                                <a href="#" onclick="loadGameWARE('<?= htmlspecialchars($game['crazygames_slug'] ?? '') ?>', <?= $game['id'] ?>); return false;"
+                                <a href="#"
+                                   onclick="loadGameWARE('<?= htmlspecialchars($game['crazygames_slug'] ?? '') ?>', <?= $game['id'] ?>); return false;"
                                    class="play-btn">
                                     <i class="fa-solid fa-play"></i> Play Now
                                 </a>
@@ -116,9 +205,9 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </main>
 
-    <!-- SaneGames Scripts (Backend still uses it for now) -->
+    <!-- SaneGames -->
     <script src="palmframe.js"></script>
-    <palmframe-widget project="w82cB8t3Jgv0" />
+    <palmframe-widget project="w82cB8t3Jgv0"></palmframe-widget>
     <script src="main.js"></script>
 
     <script>
@@ -130,10 +219,16 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
             return;
         }
 
+        // Auto enter game mode
+        document.body.classList.add('game-mode');
+        updateGameButton();
+
         // Track play start
         fetch('track_play.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
             body: `game_id=${gameId}`
         })
         .then(res => res.json())
@@ -144,21 +239,37 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
         })
         .catch(() => {});
 
-        // Load via SaneGames backend
         const currentUrl = new URL(window.location.href);
         currentUrl.search = `?game=${encodeURIComponent(slug)}`;
         window.location.href = currentUrl.toString();
     }
 
-    // Auto end session when leaving
-    window.addEventListener('beforeunload', function() {
+    // End session when leaving
+    window.addEventListener('beforeunload', function () {
         if (currentSessionId) {
             navigator.sendBeacon('end_play.php', new URLSearchParams({
                 session_id: currentSessionId
             }));
         }
     });
+
+    // Toggle game mode
+    const toggleBtn = document.getElementById('toggleGameMode');
+
+    function updateGameButton() {
+        toggleBtn.innerText = document.body.classList.contains('game-mode')
+            ? '❌ Exit Game Mode'
+            : '🎮 Game Mode';
+    }
+
+    toggleBtn.addEventListener('click', function () {
+        document.body.classList.toggle('game-mode');
+        updateGameButton();
+    });
+
+    updateGameButton();
     </script>
 
-
 <?php include "inc/footer.php"; ?>
+</body>
+</html>
