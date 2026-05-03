@@ -1,5 +1,8 @@
 <?php
 
+include "inc/header.php";
+include "inc/navbar.php";
+
 /* CONNECT DB */
 if (!isset($conn)) {
     require_once "config/database.php";
@@ -156,3 +159,6 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     });
     </script>
+
+
+<?php include "inc/footer.php"; ?>
