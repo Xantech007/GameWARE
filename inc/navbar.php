@@ -146,28 +146,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </a>
             <?php endif; ?>
 
-            <!-- Balance -->
-            <span class="balance">
-                <i class="fa-solid fa-wallet"></i>
-                <span id="navBalance">
-                    <?php
-                    $user_balance = $_SESSION['balance'] ?? 0.00;
-
-                    // Optional DB sync (keeps it accurate on refresh)
-                    if (isset($_SESSION['user_id']) && isset($conn)) {
-                        $stmt = $conn->prepare("SELECT balance FROM users WHERE id = ?");
-                        $stmt->execute([$_SESSION['user_id']]);
-                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                        if ($row) {
-                            $user_balance = $row['balance'];
-                            $_SESSION['balance'] = $user_balance; // keep session in sync
-                        }
-                    }
-
-                    echo ($currency ?? '$') . number_format($user_balance, 4);
-                    ?>
-                </span>
-            </span>
 
             <!-- Logout -->
             <a href="/logout.php">
